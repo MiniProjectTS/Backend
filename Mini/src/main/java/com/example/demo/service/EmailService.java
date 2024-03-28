@@ -19,7 +19,7 @@ public class EmailService {
         MimeMessageHelper mailMessage = new MimeMessageHelper(message, true);
         mailMessage.setTo(email);
         mailMessage.setSubject("Your Timetable");
-        mailMessage.setText("Your Certificate for participant");
+        mailMessage.setText("Your Timetable Is Ready...");
         mailMessage.addAttachment("Timetable.pdf", new ByteArrayResource(certificate));
         javaMailSender.send(message);
         System.out.println("Sent");
