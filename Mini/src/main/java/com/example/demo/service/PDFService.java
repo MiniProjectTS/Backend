@@ -6,6 +6,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -19,7 +20,7 @@ public class PDFService
     TimetableService timetableService;
     @Autowired
     EmailService emailService;
-    public void createPDF() throws IOException, MessagingException {
+    public ResponseEntity<String> createPDF(String email) throws IOException, MessagingException {
         try (PDDocument document = new PDDocument()) {
             List<String> timetable = timetableService.createTimetable();
 
@@ -54,7 +55,7 @@ public class PDFService
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             document.save(byteArrayOutputStream);
             byte[] generateTimetable = byteArrayOutputStream.toByteArray();
-            emailService.sendMail("gheewalasaurav44@gmail.com",generateTimetable);
+            return emailService.sendMail(email,generateTimetable);
         }
     }
 

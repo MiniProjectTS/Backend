@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class TimetableService {
@@ -23,18 +21,28 @@ public class TimetableService {
         LocalTime endTime = LocalTime.of(17, 0);
         LocalTime currentTime = startTime;
 
+        // Keep track of assigned courses for each day
+        Set<String> assignedCourses = new HashSet<>();
+
         for (int day = 0; day < 6; day++) { // Loop for 6 days of the week
             timetable.add("Day " + (day + 1) + ":");
 
+            // Reset assigned courses for the new day
+            assignedCourses.clear();
+
             for (int lecture = 0; lecture < 6; lecture++) { // 5 lectures per day
                 if (currentTime.isBefore(endTime) && !isBetween(currentTime, LocalTime.of(13, 0), LocalTime.of(14, 0))) {
-                    String course = sampleDataService.getCourses().get(lecture);
+                    String course;
+                    do {
+                        course = sampleDataService.getCourses().get(random.nextInt(sampleDataService.getCourses().size()));
+                    } while (assignedCourses.contains(course)); // Ensure course is not already assigned
+                    assignedCourses.add(course);
+
                     String teacher = sampleDataService.getTeachers().get(random.nextInt(sampleDataService.getTeachers().size()));
                     timetable.add("Slot " + (lecture + 1) + ": " + course + " with " + teacher + " - " + currentTime + " - " + currentTime.plusHours(1));
                     currentTime = currentTime.plusHours(1);
-                }
-                else {
-                    timetable.add("Slot " + (lecture + 1) + ": " + "Break"+  " - " + currentTime + " - " + currentTime.plusHours(1));
+                } else {
+                    timetable.add("Slot " + (lecture + 1) + ": " + "Break" + " - " + currentTime + " - " + currentTime.plusHours(1));
                     currentTime = currentTime.plusHours(1);
                 }
             }
@@ -44,8 +52,7 @@ public class TimetableService {
                 String teacher = sampleDataService.getTeachers().get(random.nextInt(sampleDataService.getTeachers().size()));
                 timetable.add("Laboratory: " + laboratory + " with " + teacher + " - " + currentTime + " - " + currentTime.plusHours(2));
                 currentTime = currentTime.plusHours(2);
-            }
-            else {
+            } else {
                 currentTime = currentTime.plusHours(1);
             }
 

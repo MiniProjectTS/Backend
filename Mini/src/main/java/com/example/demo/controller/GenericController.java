@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -77,7 +78,10 @@ public class GenericController   {
     }
 
     @GetMapping("/generate")
-    public void CreateAndSendTimetable() throws MessagingException, IOException {
-        pdfService.createPDF();
+    public ResponseEntity<String> CreateAndSendTimetable(Principal principal) throws MessagingException, IOException {
+        logger.info(principal.getName());
+        return pdfService.createPDF(principal.getName());
     }
+
+
 }
