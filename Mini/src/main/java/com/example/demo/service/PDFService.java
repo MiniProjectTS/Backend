@@ -17,14 +17,14 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
-public class PDFService {
+public class PDFService
+{
     private final Logger logger = LoggerFactory.getLogger(PDFService.class);
 
     @Autowired
     TimetableService timetableService;
     @Autowired
     EmailService emailService;
-
     public ResponseEntity<String> createPDF(String email) throws IOException, MessagingException {
         try (PDDocument document = new PDDocument()) {
             List<String> timetable = timetableService.createTimetable();
@@ -43,10 +43,6 @@ public class PDFService {
             PDPage currentPage = new PDPage();
             document.addPage(currentPage);
             PDPageContentStream contentStream = new PDPageContentStream(document, currentPage);
-
-            // Draw headers on the first page
-            drawTable(contentStream, xPosition, yStart, tableWidth, rowHeight, margin, new String[]{"Slots", "Course", "Timing"}, new float[]{1, 1, 1});
-            yStart -= rowHeight * 2; // Adjust yStart to start below the headers
 
             // Display each day's timetable vertically
             for (String entry : timetable) {
@@ -69,10 +65,6 @@ public class PDFService {
                         document.addPage(currentPage);
                         contentStream = new PDPageContentStream(document, currentPage);
                         yStart = 700; // Reset Y position for the new page
-
-                        // Draw headers on the new page
-                        drawTable(contentStream, xPosition, yStart, tableWidth, rowHeight, margin, new String[]{"Slots", "Course", "Timing"}, new float[]{1, 1, 1});
-                        yStart -= rowHeight * 2; // Adjust yStart to start below the headers
                     }
                 }
             }
@@ -89,14 +81,19 @@ public class PDFService {
         }
     }
 
+
+
     private void drawTable(PDPageContentStream contentStream, float xStart, float yStart, float tableWidth,
                            float rowHeight, float cellMargin, String[] headers, float[] columnWidths) throws IOException {
         float yPosition = yStart;
         float tableHeight = rowHeight * 2; // 2 rows for header and one row for each entry
 
-        for (int i = 0; i < headers.length; i++) {
-            float cellWidth = columnWidths[i] * tableWidth;
-            drawCell(contentStream, xStart + i * cellWidth, yPosition, cellWidth, rowHeight, headers[i]);
+        for (int i = 0; i <= headers.length; i++) {
+            contentStream.drawLine(xStart, yPosition, xStart + tableWidth, yPosition);
+            if (i < headers.length) {
+                float cellWidth = columnWidths[i] * tableWidth;
+                drawCell(contentStream, xStart, yPosition, cellWidth, rowHeight, headers[i]);
+            }
             yPosition -= rowHeight;
         }
         contentStream.drawLine(xStart, yPosition + rowHeight, xStart + tableWidth, yPosition + rowHeight);
@@ -130,4 +127,3 @@ public class PDFService {
         contentStream.endText();
     }
 }
-
